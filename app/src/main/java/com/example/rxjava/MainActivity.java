@@ -25,6 +25,9 @@ public class MainActivity extends AppCompatActivity {
     /// that will be responsible for getting data from the observer
     private Observer<String> myObserver;
 
+    /// we create our disposable, this will help us to dispose all the subscriptions when this activity is disposed
+    private Disposable disposable;
+
     private TextView mainTextView;
 
     @Override
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         myObserver = new Observer<String>() {
             @Override
             public void onSubscribe(@NonNull Disposable d) {
+                disposable = d;
                 Log.d("RxDemo", "myObserver subscribed with " + d.toString());
             }
 
@@ -74,5 +78,14 @@ public class MainActivity extends AppCompatActivity {
         myObservable.subscribe(myObserver);
 
         /// here we are not setting any schedulers(threads), so it will all happen in our main thread
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        /// as our disposable has the subscription in it,
+        /// calling dispose on it will remove the subscription
+        disposable.dispose();;
     }
 }
