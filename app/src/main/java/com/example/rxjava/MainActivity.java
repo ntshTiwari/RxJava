@@ -16,6 +16,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
+/// docs: https://reactivex.io/documentation/operators/range.html
 public class MainActivity extends AppCompatActivity {
 
     private String greeting = "Hello from RxJava";
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     /// we define an Observable of type String,
     /// that will be responsible for emitting data to us
-    private Observable<String> myObservable;
+    private Observable<Integer> myObservable;
 
     /// a CompositeDisposable, can help us dispose a stream of Observers,
     /// this way, we will not have to call dispose() methods on all Observers one by one
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         /// we pass an array of values,
         /// it will returned one by one, in our `onNext()` param
-        myObservable = Observable.fromArray(items);
+        myObservable = Observable.range(1, 20);
 
         /// subscribeWith returns us a Disposable, so, we can directly add it to our compositeDisposable
         compositeDisposable.add(
@@ -47,10 +48,10 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-    private DisposableObserver<String> getObserver() {
-        DisposableObserver<String> observer = new DisposableObserver<String>() {
+    private DisposableObserver<Integer> getObserver() {
+        DisposableObserver<Integer> observer = new DisposableObserver<Integer>() {
             @Override
-            public void onNext(@NonNull String s) {
+            public void onNext(@NonNull Integer s) {
                 Log.d("RxDemo", "myObserver onNext called " + s);
             }
 
