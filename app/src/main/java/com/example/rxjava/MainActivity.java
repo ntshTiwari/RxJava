@@ -51,39 +51,6 @@ public class MainActivity extends AppCompatActivity {
         /// we create an Observable with just one String value
         myObservable = Observable.just(greeting);
 
-        /// we add this `subscribeOn` Scheduler (Schedulers.io()) to our Observable,
-        /// which means, all the operations of our Observable will happen on this thread
-        myObservable.subscribeOn(Schedulers.io());
-
-        /// we add this `observeOn` (AndroidSchedulers.mainThread()) to our Observable,
-        /// which means, our Observable can be observed on this thread
-        myObservable.observeOn(AndroidSchedulers.mainThread());
-
-        /// we create an Observer of type string
-//        myObserver = new Observer<String>() {
-//            @Override
-//            public void onSubscribe(@NonNull Disposable d) {
-//                disposable = d;
-//                Log.d("RxDemo", "myObserver subscribed with " + d.toString());
-//            }
-//
-//            @Override
-//            public void onNext(@NonNull String s) {
-//                mainTextView.setText(s);
-//                Log.d("RxDemo", "myObserver onNext called " + s);
-//            }
-//
-//            @Override
-//            public void onError(@NonNull Throwable e) {
-//                Log.d("RxDemo", "myObserver onError called");
-//            }
-//
-//            @Override
-//            public void onComplete() {
-//                Log.d("RxDemo", "myObserver onComplete called");
-//            }
-//        };
-
         /// we declare a new DisposableObserver
         /// in a DisposableObserver, we don't get an `onSubscribe` method, as
         /// we get the Disposable directly from `DisposableObserver`
@@ -105,11 +72,12 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        /// we attach the observer to the observable
-        /// this is how our observer will start getting data emitted from our observable
-        myObservable.subscribe(myObserver);
-        /// whenever we attach an Observer, we add it to out compositeDisposable, to dispose it later
-        compositeDisposable.add(myObserver);
+        /// subscribeWith returns us a Disposable, so, we can directly add it to our compositeDisposable
+        compositeDisposable.add(
+                myObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(myObserver)
+        );
 
         /// we create one more Observer
         myObserver2 = new DisposableObserver<String>() {
@@ -128,22 +96,16 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-        myObservable.subscribe(myObserver2);
-        compositeDisposable.add(myObserver2);
 
-        /// here we are not setting any schedulers(threads), so it will all happen in our main thread
+        /// as we have already added `subscribeOn` and `observeOn`, we don't have to add it here
+        compositeDisposable.add(
+                myObservable.subscribeWith(myObserver2)
+        );
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        /// as our disposable has the subscription in it,
-        /// calling dispose on it will remove the subscription
-        // disposable.dispose();
-
-        /// now, we can directly call the dispose method of the `DisposableObserver`
-        // myObserver.dispose();
 
         compositeDisposable.clear();
     }
