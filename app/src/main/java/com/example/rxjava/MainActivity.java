@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +36,14 @@ public class MainActivity extends AppCompatActivity {
 
         /// we create an Observable with just one String value
         myObservable = Observable.just(greeting);
+
+        /// we add this `subscribeOn` Scheduler (Schedulers.io()) to our Observable,
+        /// which means, all the operations of our Observable will happen on this thread
+        myObservable.subscribeOn(Schedulers.io());
+
+        /// we add this `observeOn` (AndroidSchedulers.mainThread()) to our Observable,
+        /// which means, our Observable can be observed on this thread
+        myObservable.observeOn(AndroidSchedulers.mainThread());
 
         /// we create an Observer of type string
         myObserver = new Observer<String>() {
