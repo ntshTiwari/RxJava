@@ -11,6 +11,7 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,10 +24,14 @@ public class MainActivity extends AppCompatActivity {
 
     /// we define an Observer of type String,
     /// that will be responsible for getting data from the observer
-    private Observer<String> myObserver;
+    // private Observer<String> myObserver;
+
+    /// we change our Observer to a DisposableObserver type
+    private DisposableObserver<String> myObserver;
 
     /// we create our disposable, this will help us to dispose all the subscriptions when this activity is disposed
-    private Disposable disposable;
+    // private Disposable disposable;
+    /// we don't need a Disposable now, as our Observer will be a DisposableObserver
 
     private TextView mainTextView;
 
@@ -49,13 +54,34 @@ public class MainActivity extends AppCompatActivity {
         myObservable.observeOn(AndroidSchedulers.mainThread());
 
         /// we create an Observer of type string
-        myObserver = new Observer<String>() {
-            @Override
-            public void onSubscribe(@NonNull Disposable d) {
-                disposable = d;
-                Log.d("RxDemo", "myObserver subscribed with " + d.toString());
-            }
+//        myObserver = new Observer<String>() {
+//            @Override
+//            public void onSubscribe(@NonNull Disposable d) {
+//                disposable = d;
+//                Log.d("RxDemo", "myObserver subscribed with " + d.toString());
+//            }
+//
+//            @Override
+//            public void onNext(@NonNull String s) {
+//                mainTextView.setText(s);
+//                Log.d("RxDemo", "myObserver onNext called " + s);
+//            }
+//
+//            @Override
+//            public void onError(@NonNull Throwable e) {
+//                Log.d("RxDemo", "myObserver onError called");
+//            }
+//
+//            @Override
+//            public void onComplete() {
+//                Log.d("RxDemo", "myObserver onComplete called");
+//            }
+//        };
 
+        /// we declare a new DisposableObserver
+        /// in a DisposableObserver, we don't get an `onSubscribe` method, as
+        /// we get the Disposable directly from `DisposableObserver`
+        myObserver = new DisposableObserver<String>() {
             @Override
             public void onNext(@NonNull String s) {
                 mainTextView.setText(s);
@@ -86,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
 
         /// as our disposable has the subscription in it,
         /// calling dispose on it will remove the subscription
-        disposable.dispose();;
+        // disposable.dispose();
+
+        /// now, we can directly call the dispose method of the `DisposableObserver`
+        myObserver.dispose();
     }
 }
