@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
 
     private String greeting = "Hello from RxJava";
 
+    private String[] items = {"Item 1", "Item 2", "Item 3"};
+
     /// we define an Observable of type String,
     /// that will be responsible for emitting data to us
     private Observable<String> myObservable;
@@ -35,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         /// we pass an array of values,
         /// it will returned one by one, in our `onNext()` param
-        myObservable = Observable.just("Item 1", "Item 2", "Item 3");
+        myObservable = Observable.fromArray(items);
 
         /// subscribeWith returns us a Disposable, so, we can directly add it to our compositeDisposable
         compositeDisposable.add(
